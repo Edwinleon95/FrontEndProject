@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import PokemonCard from "./PokemonCard";
+import { usePokemon } from "./PokemonContext";
 
 interface Post {
     name: string;
     height: number;
     sprites: {
-        front_default: string
+        front_default: string;
     };
 }
 
@@ -16,70 +17,53 @@ const ContainerCards: React.FC = () => {
     const [error, setError] = useState<string>("");
     const limit: number = 12;
     const [offset, setOffset] = useState<number>(0);
+    const { pokemon } = usePokemon();
+
+    // Fetch Pokemons function (used for both initial and scroll-based fetching)
+    const fetchPokemons = useCallback(async (currentOffset: number) => {
+        try {
+            const allPokemons = await axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=${limit}&offset=${currentOffset}`);
+            const response = await Promise.all(
+                allPokemons.data.results.map(async (pokemon: any) => {
+                    const result = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+                    return result.data;
+                })
+            );
+
+            // Update the list of pokemons, ensuring no duplicates
+            setPokemons((prevPokemons) => [
+                ...new Map([...prevPokemons, ...response].map(pokemon => [pokemon.name, pokemon])).values(),
+            ]);
+        } catch (err) {
+            setError("Failed to fetch pokemons. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    }, [limit]);
 
     useEffect(() => {
-        const fetchpokemons = async () => {
-            try {
-                const allPokemons = await axios.get(`https://pokeapi.co/api/v2/pokemon//?limit=${limit}&offset=${offset}`);
-                const response = await Promise.all(
-                    allPokemons.data.results.map(async (pokemon: any) => {
-                        const result = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
-                        return result.data;
-                    })
-                );
-                setPokemons(response);
-                setLoading(false);
-            } catch (err) {
-                setError("Failed to fetch pokemons. Please try again later.");
-                setLoading(false);
-            }
-        };
+        // Fetch initial list of pokemons
+        fetchPokemons(offset);
+    }, [fetchPokemons, offset]);
 
-        fetchpokemons();
-    }, []);
+    // Handle infinite scrolling
+    const handleScroll = useCallback(() => {
+        if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight) {
+            setOffset((prevOffset) => {
+                const newOffset = prevOffset + limit;
+                fetchPokemons(newOffset); // Fetch new data using the updated offset
+                return newOffset;
+            });
+        }
+    }, [fetchPokemons]);
 
     useEffect(() => {
-        const handleScroll = async () => {
-            if (
-                window.innerHeight + document.documentElement.scrollTop ===
-                document.documentElement.offsetHeight
-            ) {
-
-                setOffset((prevOffset) => {
-                    const newOffset = prevOffset + limit;
-                    fetchPokemons(newOffset); // Fetch new data using the updated offset
-                    return newOffset;
-                });
-            }
-        };
-
-        const fetchPokemons = async (currentOffset: number) => {
-            try {
-                const allPokemons = await axios.get(
-                    `https://pokeapi.co/api/v2/pokemon/?limit=${limit}&offset=${currentOffset}`
-                );
-
-                const response = await Promise.all(
-                    allPokemons.data.results.map(async (pokemon: any) => {
-                        const result = await axios.get(
-                            `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
-                        );
-                        return result.data;
-                    })
-                );
-
-                setPokemons((prevPokemons) => [...new Map([...prevPokemons, ...response].map(pokemon => [pokemon.name, pokemon])).values()]);
-            } catch (err) {
-                setError("Failed to fetch pokemons. Please try again later.");
-            } finally {
-                setLoading(false); // Stop loading after fetching
-            }
-        };
-
+        // Attach the scroll event listener
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [loading, limit]);
-
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, [handleScroll]);
 
     if (loading) {
         return (
@@ -89,34 +73,38 @@ const ContainerCards: React.FC = () => {
         );
     }
 
-
     if (error) {
-        return <p >{error}</p>;
+        return <p>{error}</p>;
     }
 
     return (
-        <div className="bg-black">
+        <div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                {pokemons.map((post) => (
+                {pokemon ? (
                     <PokemonCard
-                        key={post.name}
-                        name={post.name}
-                        height={post.height}
-                        sprites={post.sprites}
-                    />))}
+                        key={pokemon.name}
+                        name={pokemon.name}
+                        height={pokemon.height}
+                        sprites={pokemon.sprites}
+                    />
+                ) : (
+                    pokemons.map((post) => (
+                        <PokemonCard
+                            key={post.name}
+                            name={post.name}
+                            height={post.height}
+                            sprites={post.sprites}
+                        />
+                    ))
+                )}
             </ul>
-            <div className="bg-black text-white text-center p-4">
-                <p className="text-lg font-medium text-blue-600 animate-loading text-center mt-4">
-                    Loading...
-                </p>
-            </div>
-
+            {!pokemon && (
+                <div className="bg-black text-white text-center p-4">
+                    <p className="text-lg font-medium text-blue-600 animate-loading text-center mt-4">Loading...</p>
+                </div>
+            )}
         </div>
-
     );
 };
 
 export default ContainerCards;
-
-
-
