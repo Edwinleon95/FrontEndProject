@@ -29,7 +29,7 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
                 setPokemon(null);
                 return;
             }
-            const result = await axios.get<PokemonData>(`https://pokeapi.co/api/v2/pokemon/${query}`);
+            const result = await axios.get<PokemonData>(`https://pokeapi.co/api/v2/pokemon/${query.toLocaleLowerCase()}`);
             setPokemon(result.data); // Save Pokémon data in state
         } catch (err) {
             console.error(err);

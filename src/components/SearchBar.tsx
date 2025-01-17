@@ -21,6 +21,11 @@ const SearchBar: React.FC = () => {
                 onChange={handleInputChange}
                 placeholder="Search..."
                 className="flex-1 p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                        handleSearch();
+                    }
+                }}
             />
             <button
                 onClick={handleSearch}
