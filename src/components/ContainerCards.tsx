@@ -17,7 +17,7 @@ const ContainerCards: React.FC = () => {
     const [error, setError] = useState<string>("");
     const limit: number = 12;
     const [offset, setOffset] = useState<number>(0);
-    const { pokemon, searchLoading } = usePokemon();
+    const { pokemon, searchLoading, errorLoading } = usePokemon();
 
     // Fetch Pokemons function (used for both initial and scroll-based fetching)
     const fetchPokemons = useCallback(async (currentOffset: number) => {
@@ -77,6 +77,11 @@ const ContainerCards: React.FC = () => {
         return <p>{error}</p>;
     }
 
+    if (errorLoading) {
+        return <div className="mt-3 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+            ❌ Pokémon not found or failed to fetch data. Please check the name and try again.
+        </div>;
+    }
     return (
         <div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">

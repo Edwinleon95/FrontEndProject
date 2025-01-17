@@ -13,6 +13,7 @@ interface PokemonData {
 // Define the context shape
 interface PokemonContextType {
     searchLoading: boolean;
+    errorLoading: boolean;
     pokemon: PokemonData | null;
     searchPokemon: (query: string) => Promise<void>;
 }
@@ -24,6 +25,7 @@ const PokemonContext = createContext<PokemonContextType | undefined>(undefined);
 export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [pokemon, setPokemon] = useState<PokemonData | null>(null);
     const [searchLoading, setSearchLoading] = useState<boolean>(false);
+    const [errorLoading, setErrorLoading] = useState<boolean>(false);
 
     const searchPokemon = async (query: string) => {
         try {
@@ -34,16 +36,18 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
             }
             const result = await axios.get<PokemonData>(`https://pokeapi.co/api/v2/pokemon/${query.toLocaleLowerCase()}`);
             setPokemon(result.data); // Save Pokémon data in state
-        } catch (err) {
-            console.error(err);
+        } catch (err: unknown) {
+            setErrorLoading(true);
+            setTimeout(() => setErrorLoading(false), 3000); // Keeping the message for 2 seconds
             setPokemon(null);
-        } finally {
+        }
+        finally {
             setSearchLoading(false);
         }
     };
 
     return (
-        <PokemonContext.Provider value={{ pokemon, searchPokemon , searchLoading }}>
+        <PokemonContext.Provider value={{ pokemon, searchPokemon, searchLoading, errorLoading }}>
             {children}
         </PokemonContext.Provider>
     );
