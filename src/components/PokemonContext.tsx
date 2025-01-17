@@ -12,6 +12,7 @@ interface PokemonData {
 
 // Define the context shape
 interface PokemonContextType {
+    searchLoading: boolean;
     pokemon: PokemonData | null;
     searchPokemon: (query: string) => Promise<void>;
 }
@@ -22,9 +23,11 @@ const PokemonContext = createContext<PokemonContextType | undefined>(undefined);
 // Create the provider
 export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [pokemon, setPokemon] = useState<PokemonData | null>(null);
+    const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
     const searchPokemon = async (query: string) => {
         try {
+            setSearchLoading(true);
             if (!query) {
                 setPokemon(null);
                 return;
@@ -34,11 +37,13 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
         } catch (err) {
             console.error(err);
             setPokemon(null);
+        } finally {
+            setSearchLoading(false);
         }
     };
 
     return (
-        <PokemonContext.Provider value={{ pokemon, searchPokemon }}>
+        <PokemonContext.Provider value={{ pokemon, searchPokemon , searchLoading }}>
             {children}
         </PokemonContext.Provider>
     );

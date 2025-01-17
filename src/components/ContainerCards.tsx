@@ -17,7 +17,7 @@ const ContainerCards: React.FC = () => {
     const [error, setError] = useState<string>("");
     const limit: number = 12;
     const [offset, setOffset] = useState<number>(0);
-    const { pokemon } = usePokemon();
+    const { pokemon, searchLoading } = usePokemon();
 
     // Fetch Pokemons function (used for both initial and scroll-based fetching)
     const fetchPokemons = useCallback(async (currentOffset: number) => {
@@ -65,7 +65,7 @@ const ContainerCards: React.FC = () => {
         };
     }, [handleScroll]);
 
-    if (loading) {
+    if (loading || searchLoading) {
         return (
             <p className="text-lg font-medium text-blue-600 animate-loading text-center mt-4">
                 Loading...
