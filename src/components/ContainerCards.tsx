@@ -2,10 +2,33 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import PokemonCard from "./PokemonCard";
 import { usePokemon } from "./PokemonContext";
+import ErrorLoading from "../assets/ErrorLoading";
+import Loading from "../assets/Loading";
+import ScrollLoading from "../assets/ScrollLoading";
 
+
+interface Stat {
+    base_stat: number;
+    effort: number;
+    stat: {
+        name: string;
+        url: string;
+    };
+}
+
+interface Type {
+    slot: number;
+    type: {
+        name: string;
+        url: string;
+    };
+}
 interface Post {
     name: string;
     height: number;
+    weight: number;
+    stats: Stat[]; // Array of stats
+    types: Type[];
     sprites: {
         front_default: string;
     };
@@ -14,14 +37,15 @@ interface Post {
 const ContainerCards: React.FC = () => {
     const [pokemons, setPokemons] = useState<Post[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isFetchingMore, setIsFetchingMore] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const limit: number = 12;
     const [offset, setOffset] = useState<number>(0);
     const { pokemon, searchLoading, errorLoading } = usePokemon();
 
-    // Fetch Pokemons function (used for both initial and scroll-based fetching)
     const fetchPokemons = useCallback(async (currentOffset: number) => {
         try {
+            setIsFetchingMore(true);
             const allPokemons = await axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=${limit}&offset=${currentOffset}`);
             const response = await Promise.all(
                 allPokemons.data.results.map(async (pokemon: any) => {
@@ -30,35 +54,29 @@ const ContainerCards: React.FC = () => {
                 })
             );
 
-            // Update the list of pokemons, ensuring no duplicates
             setPokemons((prevPokemons) => [
                 ...new Map([...prevPokemons, ...response].map(pokemon => [pokemon.name, pokemon])).values(),
             ]);
         } catch (err) {
-            setError("Failed to fetch pokemons. Please try again later.");
+            console.error("Error fetching Pokémons:", err);
+            setError("Failed to fetch Pokémon. Please try again later.");
         } finally {
             setLoading(false);
+            setIsFetchingMore(false);
         }
     }, [limit]);
 
     useEffect(() => {
-        // Fetch initial list of pokemons
         fetchPokemons(offset);
     }, [fetchPokemons, offset]);
 
-    // Handle infinite scrolling
     const handleScroll = useCallback(() => {
-        if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight) {
-            setOffset((prevOffset) => {
-                const newOffset = prevOffset + limit;
-                fetchPokemons(newOffset); // Fetch new data using the updated offset
-                return newOffset;
-            });
+        if (window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 10) {
+            setOffset(prevOffset => prevOffset + limit);
         }
-    }, [fetchPokemons]);
+    }, []);
 
     useEffect(() => {
-        // Attach the scroll event listener
         window.addEventListener("scroll", handleScroll);
         return () => {
             window.removeEventListener("scroll", handleScroll);
@@ -67,46 +85,45 @@ const ContainerCards: React.FC = () => {
 
     if (loading || searchLoading) {
         return (
-            <p className="text-lg font-medium text-blue-600 animate-loading text-center mt-4">
-                Loading...
-            </p>
+            <Loading />
         );
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return (
+            <div className="flex justify-center mt-6">
+                <p className="px-6 py-3 bg-gradient-to-r from-red-100 to-red-200 border border-red-400 text-red-700 rounded-lg shadow-md text-center">
+                    ❌ {error}
+                </p>
+            </div>
+        );
     }
 
     if (errorLoading) {
-        return <div className="mt-3 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
-            ❌ Pokémon not found or failed to fetch data. Please check the name and try again.
-        </div>;
+        return (
+            <ErrorLoading />
+        );
     }
+
+    const displayedPokemons = pokemon ? [pokemon] : pokemons;
+
     return (
         <div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                {pokemon ? (
+                {displayedPokemons.map((post) => (
                     <PokemonCard
-                        key={pokemon.name}
-                        name={pokemon.name}
-                        height={pokemon.height}
-                        sprites={pokemon.sprites}
+                        key={post.name}
+                        name={post.name}
+                        height={post.height}
+                        weight={post.weight}
+                        sprites={post.sprites}
+                        stats={post.stats}
+                        types={post.types}
                     />
-                ) : (
-                    pokemons.map((post) => (
-                        <PokemonCard
-                            key={post.name}
-                            name={post.name}
-                            height={post.height}
-                            sprites={post.sprites}
-                        />
-                    ))
-                )}
+                ))}
             </ul>
-            {!pokemon && (
-                <div className="bg-black text-white text-center p-4">
-                    <p className="text-lg font-medium text-blue-600 animate-loading text-center mt-4">Loading...</p>
-                </div>
+            {!pokemon && isFetchingMore && (
+                <ScrollLoading />
             )}
         </div>
     );

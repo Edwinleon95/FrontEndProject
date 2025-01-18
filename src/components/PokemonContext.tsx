@@ -1,14 +1,35 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import axios from "axios";
 
+// Define the Stat and Type interfaces
+interface Stat {
+    base_stat: number;
+    effort: number;
+    stat: {
+        name: string;
+        url: string;
+    };
+}
+
+interface Type {
+    slot: number;
+    type: {
+        name: string;
+        url: string;
+    };
+}
+
 // Define the structure of the Pokémon data
 interface PokemonData {
     name: string;
     height: number;
+    weight: number;
     sprites: {
-        front_default: string
+        front_default: string;
     };
-};
+    stats: Stat[];  // Add stats
+    types: Type[];  // Add types
+}
 
 // Define the context shape
 interface PokemonContextType {
@@ -34,14 +55,22 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
                 setPokemon(null);
                 return;
             }
-            const result = await axios.get<PokemonData>(`https://pokeapi.co/api/v2/pokemon/${query.toLocaleLowerCase()}`);
-            setPokemon(result.data); // Save Pokémon data in state
+            const result = await axios.get<PokemonData>(`https://pokeapi.co/api/v2/pokemon/${query.toLowerCase()}`);
+            
+            // Ensure the response includes stats and types
+            setPokemon({
+                name: result.data.name,
+                height: result.data.height,
+                weight: result.data.weight,
+                sprites: result.data.sprites,
+                stats: result.data.stats, 
+                types: result.data.types
+            });
         } catch (err: unknown) {
             setErrorLoading(true);
-            setTimeout(() => setErrorLoading(false), 3000); // Keeping the message for 2 seconds
+            setTimeout(() => setErrorLoading(false), 3000); // Keep the message for 3 seconds
             setPokemon(null);
-        }
-        finally {
+        } finally {
             setSearchLoading(false);
         }
     };

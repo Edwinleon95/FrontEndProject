@@ -7,12 +7,13 @@ export default {
   theme: {
     extend: {
       animation: {
-        loading: 'loading 1.5s infinite',
+        'loading': 'loadingAnimation 1.5s infinite ease-in-out',
       },
       keyframes: {
-        loading: {
-          '0%, 100%': { opacity: 0.2 },
-          '50%': { opacity: 1 },
+        loadingAnimation: {
+          '0%': { opacity: '0.5' },
+          '50%': { opacity: '1' },
+          '100%': { opacity: '0.5' },
         },
       },
     },
