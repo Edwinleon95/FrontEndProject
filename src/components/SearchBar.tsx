@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { usePokemon } from "./PokemonContext";
+import Pokeball from "../assets/icons/Pokeball";
 
 const SearchBar: React.FC = () => {
     const [query, setQuery] = useState("");
@@ -7,7 +8,6 @@ const SearchBar: React.FC = () => {
 
     const handleSearch = useCallback(async () => {
         const trimmedQuery = query.trim();
-        if (!trimmedQuery) return; // Prevent empty searches
         await searchPokemon(trimmedQuery);
     }, [query, searchPokemon]);
 
@@ -23,16 +23,17 @@ const SearchBar: React.FC = () => {
                 className="flex-1 px-4 py-2 bg-transparent text-gray-700 text-sm placeholder-gray-500 focus:outline-none focus:ring-0"
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            
+
             {/* Search Button */}
             <button
                 onClick={handleSearch}
-                className="px-5 py-2 text-sm font-semibold text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all active:scale-95"
                 aria-label="Search"
+                className="rounded-full shadow-md flex items-center justify-center transition-transform transform hover:scale-105 active:ring-2 active:ring-[#db071c]"
             >
-                🔍
+                <Pokeball className="w-8 h-8 md:w-10 md:h-10" />
             </button>
         </div>
+
     );
 };
 
