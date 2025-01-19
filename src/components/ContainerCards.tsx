@@ -91,8 +91,8 @@ const ContainerCards: React.FC = () => {
 
     if (error) {
         return (
-            <div className="flex justify-center mt-6">
-                <p className="px-6 py-3 bg-gradient-to-r from-red-100 to-red-200 border border-red-400 text-red-700 rounded-lg shadow-md text-center">
+            <div className="flex justify-center mt-4">
+                <p className="px-4 py-2 bg-red-200 text-red-700 rounded-md text-sm shadow-md">
                     ❌ {error}
                 </p>
             </div>
@@ -108,18 +108,10 @@ const ContainerCards: React.FC = () => {
     const displayedPokemons = pokemon ? [pokemon] : pokemons;
 
     return (
-        <div>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        <div className="p-2 sm:p-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {displayedPokemons.map((post) => (
-                    <PokemonCard
-                        key={post.name}
-                        name={post.name}
-                        height={post.height}
-                        weight={post.weight}
-                        sprites={post.sprites}
-                        stats={post.stats}
-                        types={post.types}
-                    />
+                    <PokemonCard key={post.name} {...post} />
                 ))}
             </ul>
             {!pokemon && isFetchingMore && (
