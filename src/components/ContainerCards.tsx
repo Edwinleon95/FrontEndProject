@@ -5,6 +5,7 @@ import { usePokemon } from "./PokemonContext";
 import ErrorLoading from "../assets/ErrorLoading";
 import Loading from "../assets/Loading";
 import ScrollLoading from "../assets/ScrollLoading";
+import { Link } from "react-router-dom";
 
 
 interface Stat {
@@ -111,7 +112,9 @@ const ContainerCards: React.FC = () => {
         <div className="p-2 sm:p-4">
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {displayedPokemons.map((post) => (
-                    <PokemonCard key={post.name} {...post} />
+                    <Link to={`/detail/${post.name}`} key={post.name}>
+                        <PokemonCard key={post.name} {...post} />
+                    </Link>
                 ))}
             </ul>
             {!pokemon && isFetchingMore && (
