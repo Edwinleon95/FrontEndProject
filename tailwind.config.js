@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        pixelify: ["'Pixelify Sans'", "sans-serif"],
+      },
       animation: {
         'loading': 'loadingAnimation 1.5s infinite ease-in-out',
       },

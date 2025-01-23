@@ -42,7 +42,7 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, height, weight, sprites
             </div>
 
             {/* Pokemon Name */}
-            <h2 className="text-lg sm:text-xl font-bold text-center capitalize mt-2 text-gray-800">{name}</h2>
+            <h2 className="text-lg sm:text-xl font-pixelify text-center capitalize mt-2 text-gray-800">{name}</h2>
 
             {/* Height & Weight */}
             <p className="text-xs sm:text-sm text-center text-gray-600 mt-1">
