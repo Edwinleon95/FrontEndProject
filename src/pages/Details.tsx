@@ -130,7 +130,7 @@ const Details = () => {
             </div> */}
 
 
-            <EvolutionContainer url={pokemon?.species?.url} />
+            <EvolutionContainer url={pokemon?.species?.url} selectedName={name}/>
             {/* Go Home Button */}
             <button
                 onClick={() => navigate("/")}

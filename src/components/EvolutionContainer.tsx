@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 interface EvolutionProps {
     url: string | undefined;
+    selectedName: string | undefined;
 }
 
 interface Stat {
@@ -34,7 +35,7 @@ interface Post {
     };
 }
 
-export const EvolutionContainer: React.FC<EvolutionProps> = ({ url }) => {
+export const EvolutionContainer: React.FC<EvolutionProps> = ({ url, selectedName }) => {
     const [evolutionArray, setEvolutionArray] = useState<Post[]>([]);
     const fetchEvolutions = useCallback(async () => {
         if (!url) return;
@@ -85,7 +86,7 @@ export const EvolutionContainer: React.FC<EvolutionProps> = ({ url }) => {
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {evolutionArray.map((post) => (
                     <Link to={`/detail/${post.name}`} key={post.name}>
-                        <EvolutionCard key={post.name} {...post} />
+                        <EvolutionCard key={post.name} {...post} selectedName={selectedName} />
                     </Link>
                 ))}
             </ul>
