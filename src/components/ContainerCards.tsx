@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import PokemonCard from "./PokemonCard";
 import { usePokemon } from "./PokemonContext";
@@ -43,6 +43,7 @@ const ContainerCards: React.FC = () => {
     const limit: number = 12;
     const [offset, setOffset] = useState<number>(0);
     const { pokemon, searchLoading, errorLoading } = usePokemon();
+    const isFirstRender = useRef(true);
 
     const fetchPokemons = useCallback(async (currentOffset: number) => {
         try {
@@ -68,6 +69,10 @@ const ContainerCards: React.FC = () => {
     }, [limit]);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         fetchPokemons(offset);
     }, [fetchPokemons, offset]);
 

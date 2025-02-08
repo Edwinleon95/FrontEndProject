@@ -1,12 +1,11 @@
 import axios from "axios";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../assets/Loading";
 import ErrorLoading from "../assets/ErrorLoading";
 import { getTypeColor } from "../utils/Helper";
-// import { ChatGPT } from "../components/ChatGPT";
+import { ChatGPT } from "../components/ChatGPT";
 import { EvolutionContainer } from "../components/EvolutionContainer";
-// import { ChatGPT } from "../services/ChatGPT";  // Adjust import path if needed
 
 interface Stat {
     base_stat: number;
@@ -45,7 +44,8 @@ const Details = () => {
     const [pokemon, setPokemon] = useState<PokemonData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    // const [chatHistory, setChatHistory] = useState<string>("");
+    const isFirstRender = useRef(true);
+    const [chatHistory, setChatHistory] = useState<string>("");
 
     // Fetch Pokémon Data
     const fetchPokemon = useCallback(async () => {
@@ -60,11 +60,11 @@ const Details = () => {
             setPokemon(response.data);
 
             // Create history data from the Pokemon details
-            // const historyData = `Pokémon${response.data.name}!`;
+            const historyData = `You are the Pokédex. Only provide the official Pokédex entry for ${response.data.name}, just like in the Pokémon video games. Keep it concise and informative.`;
 
             // Fetch the Pokémon history from OpenAI (ChatGPT)
-            // const chatResponse = await ChatGPT(historyData);
-            // setChatHistory(chatResponse);
+            const chatResponse = await ChatGPT(historyData);
+            setChatHistory(chatResponse);
         } catch (err) {
             setError("Failed to load Pokémon. Redirecting to home...");
             setTimeout(() => navigate("/"), 2000);
@@ -74,6 +74,10 @@ const Details = () => {
     }, [name, navigate]);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         fetchPokemon();
     }, [fetchPokemon]);
 
@@ -91,7 +95,7 @@ const Details = () => {
             />
 
             <div className="text-center mt-6">
-                <p className="text-lg font-semibold">Height: {pokemon?.height}</p>
+                <p className="text-lg font-semibold">Height: {pokemon?.height} cm</p>
                 <p className="text-lg font-semibold">Weight: {pokemon?.weight}</p>
             </div>
 
@@ -124,13 +128,13 @@ const Details = () => {
             </div>
 
             {/* Display ChatGPT's response */}
-            {/* <div className="mt-6 w-full max-w-md bg-white text-black p-4 rounded-lg shadow-md">
+            <div className="mt-6 w-full max-w-md bg-white text-black p-4 rounded-lg shadow-md">
                 <h2 className="text-xl font-semibold mb-3 text-center">Pokémon History</h2>
                 <p>{chatHistory}</p>
-            </div> */}
+            </div>
 
 
-            <EvolutionContainer url={pokemon?.species?.url} selectedName={name}/>
+            <EvolutionContainer url={pokemon?.species?.url} selectedName={name} />
             {/* Go Home Button */}
             <button
                 onClick={() => navigate("/")}
