@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EvolutionCard } from "./EvolutionCard";
 import { Link } from "react-router-dom";
 import Loading from "../assets/Loading";
@@ -40,7 +40,6 @@ interface Post {
 export const EvolutionContainer: React.FC<EvolutionProps> = ({ url, selectedName }) => {
     const [evolutionArray, setEvolutionArray] = useState<Post[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const isFirstRender = useRef(true);
 
     const fetchEvolutions = useCallback(async () => {
         if (!url) return;
@@ -79,10 +78,6 @@ export const EvolutionContainer: React.FC<EvolutionProps> = ({ url, selectedName
     }, [url]);
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
         fetchEvolutions();
     }, [fetchEvolutions]);
 

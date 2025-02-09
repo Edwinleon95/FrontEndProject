@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../assets/Loading";
 import ErrorLoading from "../assets/ErrorLoading";
@@ -44,7 +44,6 @@ const Details = () => {
     const [pokemon, setPokemon] = useState<PokemonData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const isFirstRender = useRef(true);
     const [chatHistory, setChatHistory] = useState<string>("");
 
     // Fetch Pokémon Data
@@ -74,10 +73,6 @@ const Details = () => {
     }, [name, navigate]);
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
         fetchPokemon();
     }, [fetchPokemon]);
 
