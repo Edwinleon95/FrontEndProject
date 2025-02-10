@@ -5,7 +5,7 @@ import SearchBar from "../components/SearchBar";
 const Home: React.FC = () => {
 
     return (
-        <div >
+        <div className="bg-gray-900">
             <PokemonProvider>
                 <SearchBar />
                 <ContainerCards />

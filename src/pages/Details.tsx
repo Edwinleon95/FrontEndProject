@@ -66,7 +66,7 @@ const Details = () => {
             setChatHistory(chatResponse);
         } catch (err) {
             setError("Failed to load Pokémon. Redirecting to home...");
-            setTimeout(() => navigate("/"), 2000);
+            setTimeout(() => navigate("/home"), 2000);
         } finally {
             setLoading(false);
         }
@@ -80,7 +80,7 @@ const Details = () => {
     if (error) return <ErrorLoading />;
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-blue-800 text-white p-6">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b text-white p-6">
             <h1 className="text-4xl font-bold mb-4 capitalize">{pokemon?.name}</h1>
 
             <img
@@ -132,7 +132,7 @@ const Details = () => {
             <EvolutionContainer url={pokemon?.species?.url} selectedName={name} />
             {/* Go Home Button */}
             <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/home")}
                 className="mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition duration-300"
             >
                 Go Home

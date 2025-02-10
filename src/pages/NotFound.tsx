@@ -8,7 +8,7 @@ const NotFound = () => {
     // Decrease counter every second and navigate when it reaches 0
     useEffect(() => {
         if (counter === 0) {
-            navigate("/");  // Navigate to home
+            navigate("/home");  // Navigate to home
             return;
         }
         const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
@@ -17,7 +17,7 @@ const NotFound = () => {
 
     // Function to manually navigate to home when the button is clicked
     const goHome = () => {
-        navigate("/");
+        navigate("/home");
     };
 
     return (
