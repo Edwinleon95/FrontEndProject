@@ -90,7 +90,7 @@ const Details = () => {
             />
 
             <div className="text-center mt-6">
-                <p className="text-lg font-semibold">Height: {pokemon?.height} cm</p>
+                <p className="text-lg font-semibold">Height: {pokemon?.height}</p>
                 <p className="text-lg font-semibold">Weight: {pokemon?.weight}</p>
             </div>
 
