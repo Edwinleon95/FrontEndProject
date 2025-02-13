@@ -44,6 +44,7 @@ export const LandingPage = () => {
                 <img src="/coding.svg" alt="Coding Icon" className="w-6 h-6 opacity-80 transition duration-300 hover:opacity-100" />
                 <span className="text-yellow-300 transition duration-300 hover:text-gray-900">by webdevinnovation.com</span>
             </a>
+            
             {/* Background Pokéballs */}
             <Pokeball className="absolute top-10 left-0 w-32 opacity-10 -rotate-12 hidden md:block text-blue-500" />
             <Pokeball className="absolute bottom-10 right-0 w-40 opacity-10 rotate-12 hidden md:block text-red-500" />
